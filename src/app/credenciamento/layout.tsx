@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { Toaster } from '@/components/ui/sonner'
 
 export default function CredenciamentoLayout({

@@ -352,7 +352,7 @@ export function ParticipantesTable() {
               Anterior
             </Button>
             <span className="text-sm">
-              Pagina {page} de {totalPages}
+              Página {page} de {totalPages}
             </span>
             <Button
               variant="outline"
@@ -360,7 +360,7 @@ export function ParticipantesTable() {
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
             >
-              Proximo
+              Próximo
             </Button>
           </div>
         </div>

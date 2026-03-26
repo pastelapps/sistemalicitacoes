@@ -119,13 +119,13 @@ export function EmpenhoForm({
     if (!file) return
 
     if (file.type !== 'application/pdf') {
-      toast.error('Apenas arquivos PDF s\u00e3o permitidos.')
+      toast.error('Apenas arquivos PDF são permitidos.')
       if (fileInputRef.current) fileInputRef.current.value = ''
       return
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      toast.error('O arquivo deve ter no m\u00e1ximo 10MB.')
+      toast.error('O arquivo deve ter no máximo 10MB.')
       if (fileInputRef.current) fileInputRef.current.value = ''
       return
     }
@@ -178,9 +178,9 @@ export function EmpenhoForm({
 
       {/* Orgao com busca */}
       <div className="space-y-2">
-        <Label htmlFor="orgao_id">\u00d3rg\u00e3o</Label>
+        <Label htmlFor="orgao_id">Órgão</Label>
         <Input
-          placeholder="Buscar \u00f3rg\u00e3o..."
+          placeholder="Buscar órgão..."
           value={orgaoSearch}
           onChange={(e) => setOrgaoSearch(e.target.value)}
           className="mb-2"
@@ -190,7 +190,7 @@ export function EmpenhoForm({
           onValueChange={(value) => setValue('orgao_id', value, { shouldValidate: true })}
         >
           <SelectTrigger>
-            <SelectValue placeholder="Selecione um \u00f3rg\u00e3o" />
+            <SelectValue placeholder="Selecione um órgão" />
           </SelectTrigger>
           <SelectContent>
             {orgaos.map((orgao) => (
@@ -207,7 +207,7 @@ export function EmpenhoForm({
 
       {/* Numero Nota */}
       <div className="space-y-2">
-        <Label htmlFor="numero_nota">N\u00famero da Nota</Label>
+        <Label htmlFor="numero_nota">Número da Nota</Label>
         <Input id="numero_nota" {...register('numero_nota')} />
         {errors.numero_nota && (
           <p className="text-sm text-red-500">{errors.numero_nota.message}</p>
@@ -263,7 +263,7 @@ export function EmpenhoForm({
 
       {/* Observacoes */}
       <div className="space-y-2">
-        <Label htmlFor="observacoes">Observa\u00e7\u00f5es</Label>
+        <Label htmlFor="observacoes">Observações</Label>
         <Textarea id="observacoes" {...register('observacoes')} rows={3} />
         {errors.observacoes && (
           <p className="text-sm text-red-500">{errors.observacoes.message}</p>
@@ -272,7 +272,7 @@ export function EmpenhoForm({
 
       {/* Upload PDF */}
       <div className="space-y-2">
-        <Label htmlFor="arquivo">Arquivo da Nota (PDF, m\u00e1x. 10MB)</Label>
+        <Label htmlFor="arquivo">Arquivo da Nota (PDF, máx. 10MB)</Label>
         <Input
           id="arquivo"
           type="file"
@@ -316,7 +316,7 @@ export function EmpenhoForm({
 
       {cursoId && orgaoId && participantes.length === 0 && (
         <p className="text-sm text-muted-foreground">
-          Nenhum participante encontrado para este curso e \u00f3rg\u00e3o.
+          Nenhum participante encontrado para este curso e órgão.
         </p>
       )}
 

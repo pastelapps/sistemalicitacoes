@@ -51,9 +51,9 @@ export function UsuarioForm({
   })
 
   const onFormSubmit = async (data: UsuarioFormData) => {
-    // Na cria\u00e7\u00e3o, senha \u00e9 obrigat\u00f3ria
+    // Na criação, senha é obrigatória
     if (!isEditing && !data.password) {
-      toast.error('Senha \u00e9 obrigat\u00f3ria para criar um usu\u00e1rio.')
+      toast.error('Senha é obrigatória para criar um usuário.')
       return
     }
 
@@ -62,7 +62,7 @@ export function UsuarioForm({
       await onSubmit(data)
     } catch (error) {
       console.error(error)
-      toast.error('Erro ao salvar usu\u00e1rio.')
+      toast.error('Erro ao salvar usuário.')
     } finally {
       setSubmitting(false)
     }
@@ -117,7 +117,7 @@ export function UsuarioForm({
           checked={watch('ativo')}
           onCheckedChange={(checked) => setValue('ativo', checked)}
         />
-        <Label htmlFor="ativo">Usu\u00e1rio ativo</Label>
+        <Label htmlFor="ativo">Usuário ativo</Label>
       </div>
 
       {/* Senha */}
@@ -140,7 +140,7 @@ export function UsuarioForm({
             id="password"
             type="password"
             {...register('password')}
-            placeholder={isEditing ? 'Deixe em branco para manter a atual' : 'M\u00ednimo 8 caracteres'}
+            placeholder={isEditing ? 'Deixe em branco para manter a atual' : 'Mínimo 8 caracteres'}
           />
           {errors.password && (
             <p className="text-sm text-red-500">{errors.password.message}</p>

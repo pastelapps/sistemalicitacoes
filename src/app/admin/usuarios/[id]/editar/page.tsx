@@ -29,12 +29,12 @@ export default function EditarUsuarioPage() {
           .single() as { data: Profile | null; error: Error | null }
 
         if (error) throw error
-        if (!data) throw new Error('Usu\u00e1rio n\u00e3o encontrado')
+        if (!data) throw new Error('Usuário não encontrado')
 
         setProfile(data)
       } catch (error) {
         console.error(error)
-        toast.error('Erro ao carregar usu\u00e1rio.')
+        toast.error('Erro ao carregar usuário.')
         router.push('/usuarios')
       } finally {
         setLoading(false)
@@ -74,16 +74,16 @@ export default function EditarUsuarioPage() {
 
     if (!response.ok) {
       const errorData = await response.json()
-      throw new Error(errorData.error || 'Erro ao atualizar usu\u00e1rio')
+      throw new Error(errorData.error || 'Erro ao atualizar usuário')
     }
 
-    toast.success('Usu\u00e1rio atualizado com sucesso!')
+    toast.success('Usuário atualizado com sucesso!')
     router.push('/usuarios')
   }
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Editar Usu\u00e1rio</h1>
+      <h1 className="text-2xl font-bold">Editar Usuário</h1>
       <UsuarioForm
         defaultValues={{
           nome: profile.nome,

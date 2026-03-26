@@ -91,7 +91,7 @@ export function UsuariosTable() {
       setData(profiles ?? [])
       setCount(total ?? 0)
     } catch (error) {
-      console.error('Erro ao carregar usu\u00e1rios:', error)
+      console.error('Erro ao carregar usuários:', error)
     } finally {
       setLoading(false)
     }
@@ -120,7 +120,7 @@ export function UsuariosTable() {
       if (checkError) throw checkError
 
       if (!admins || admins.length === 0) {
-        toast.error('N\u00e3o \u00e9 poss\u00edvel desativar. Deve existir ao menos 1 administrador ativo.')
+        toast.error('Não é possível desativar. Deve existir ao menos 1 administrador ativo.')
         setDesativarDialogOpen(false)
         return
       }
@@ -133,15 +133,15 @@ export function UsuariosTable() {
 
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.error || 'Erro ao desativar usu\u00e1rio')
+        throw new Error(errorData.error || 'Erro ao desativar usuário')
       }
 
-      toast.success('Usu\u00e1rio desativado com sucesso!')
+      toast.success('Usuário desativado com sucesso!')
       setDesativarDialogOpen(false)
       loadData()
     } catch (error) {
       console.error(error)
-      toast.error(error instanceof Error ? error.message : 'Erro ao desativar usu\u00e1rio.')
+      toast.error(error instanceof Error ? error.message : 'Erro ao desativar usuário.')
     } finally {
       setActionLoading(false)
     }
@@ -197,7 +197,7 @@ export function UsuariosTable() {
       },
       {
         accessorKey: 'ultimo_acesso',
-        header: '\u00daltimo Acesso',
+        header: 'Último Acesso',
         cell: ({ row }) =>
           row.original.ultimo_acesso
             ? formatDateTime(row.original.ultimo_acesso)
@@ -205,7 +205,7 @@ export function UsuariosTable() {
       },
       {
         id: 'acoes',
-        header: 'A\u00e7\u00f5es',
+        header: 'Ações',
         cell: ({ row }) => {
           const user = row.original
           return (
@@ -252,10 +252,10 @@ export function UsuariosTable() {
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Usu\u00e1rios do Sistema</h1>
+        <h1 className="text-2xl font-bold">Usuários do Sistema</h1>
         <Button onClick={() => router.push('/usuarios/novo')}>
           <Plus className="mr-2 h-4 w-4" />
-          Novo Usu\u00e1rio
+          Novo Usuário
         </Button>
       </div>
 
@@ -331,7 +331,7 @@ export function UsuariosTable() {
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  Nenhum usu\u00e1rio encontrado.
+                  Nenhum usuário encontrado.
                 </TableCell>
               </TableRow>
             ) : (
@@ -355,7 +355,7 @@ export function UsuariosTable() {
       {/* Pagination */}
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
-          {count} usu\u00e1rio{count !== 1 ? 's' : ''} encontrado{count !== 1 ? 's' : ''}
+          {count} usuário{count !== 1 ? 's' : ''} encontrado{count !== 1 ? 's' : ''}
         </p>
         <div className="flex items-center gap-2">
           <Button
@@ -367,7 +367,7 @@ export function UsuariosTable() {
             Anterior
           </Button>
           <span className="text-sm text-muted-foreground">
-            P\u00e1gina {page} de {totalPages || 1}
+            Página {page} de {totalPages || 1}
           </span>
           <Button
             variant="outline"
@@ -375,7 +375,7 @@ export function UsuariosTable() {
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page >= totalPages}
           >
-            Pr\u00f3ximo
+            Próximo
           </Button>
         </div>
       </div>
@@ -384,10 +384,10 @@ export function UsuariosTable() {
       <Dialog open={desativarDialogOpen} onOpenChange={setDesativarDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Desativar Usu\u00e1rio</DialogTitle>
+            <DialogTitle>Desativar Usuário</DialogTitle>
             <DialogDescription>
-              Tem certeza que deseja desativar este usu\u00e1rio? Ele n\u00e3o poder\u00e1 mais
-              acessar o sistema at\u00e9 ser reativado.
+              Tem certeza que deseja desativar este usuário? Ele não poderá mais
+              acessar o sistema até ser reativado.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

@@ -145,14 +145,14 @@ export function EmpenhosTable() {
     () => [
       {
         accessorKey: 'numero_nota',
-        header: 'N\u00ba Nota',
+        header: 'Nº Nota',
         cell: ({ row }) => (
           <span className="font-medium">{row.original.numero_nota}</span>
         ),
       },
       {
         id: 'orgao',
-        header: '\u00d3rg\u00e3o',
+        header: 'Órgão',
         cell: ({ row }) => row.original.orgao?.nome ?? '-',
       },
       {
@@ -206,7 +206,7 @@ export function EmpenhosTable() {
       },
       {
         id: 'acoes',
-        header: 'A\u00e7\u00f5es',
+        header: 'Ações',
         cell: ({ row }) => {
           const empenho = row.original
           const canApprove = empenho.status === 'pendente' || empenho.status === 'recebida'
@@ -278,7 +278,7 @@ export function EmpenhosTable() {
       {/* Filters */}
       <div className="flex items-center gap-4">
         <Input
-          placeholder="Buscar por n\u00famero da nota..."
+          placeholder="Buscar por número da nota..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="max-w-sm"
@@ -394,7 +394,7 @@ export function EmpenhosTable() {
             Anterior
           </Button>
           <span className="text-sm text-muted-foreground">
-            P\u00e1gina {page} de {totalPages || 1}
+            Página {page} de {totalPages || 1}
           </span>
           <Button
             variant="outline"
@@ -402,7 +402,7 @@ export function EmpenhosTable() {
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page >= totalPages}
           >
-            Pr\u00f3ximo
+            Próximo
           </Button>
         </div>
       </div>
@@ -414,7 +414,7 @@ export function EmpenhosTable() {
             <DialogTitle>Aprovar Nota de Empenho</DialogTitle>
             <DialogDescription>
               Tem certeza que deseja aprovar esta nota de empenho? Os participantes vinculados
-              ter\u00e3o o status de pagamento atualizado para &quot;Confirmado&quot;.
+              terão o status de pagamento atualizado para &quot;Confirmado&quot;.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -438,11 +438,11 @@ export function EmpenhosTable() {
           <DialogHeader>
             <DialogTitle>Rejeitar Nota de Empenho</DialogTitle>
             <DialogDescription>
-              Informe o motivo da rejei\u00e7\u00e3o desta nota de empenho.
+              Informe o motivo da rejeição desta nota de empenho.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-2">
-            <Label htmlFor="motivo">Motivo da rejei\u00e7\u00e3o</Label>
+            <Label htmlFor="motivo">Motivo da rejeição</Label>
             <Textarea
               id="motivo"
               value={motivoRejeicao}

@@ -23,16 +23,16 @@ export default function NovoUsuarioPage() {
 
     if (!response.ok) {
       const errorData = await response.json()
-      throw new Error(errorData.error || 'Erro ao criar usu\u00e1rio')
+      throw new Error(errorData.error || 'Erro ao criar usuário')
     }
 
-    toast.success('Usu\u00e1rio criado com sucesso!')
+    toast.success('Usuário criado com sucesso!')
     router.push('/usuarios')
   }
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Novo Usu\u00e1rio</h1>
+      <h1 className="text-2xl font-bold">Novo Usuário</h1>
       <UsuarioForm onSubmit={handleSubmit} />
     </div>
   )

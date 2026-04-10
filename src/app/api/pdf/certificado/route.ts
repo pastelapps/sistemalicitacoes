@@ -53,8 +53,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const dataEmissao = new Date().toISOString().split('T')[0]
-
     // Verifica se ja existe certificado para este participante
     const { data: existingCert } = await supabase
       .from('certificados')

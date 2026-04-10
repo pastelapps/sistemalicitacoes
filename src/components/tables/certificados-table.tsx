@@ -7,7 +7,7 @@ import {
   flexRender,
   type ColumnDef,
 } from '@tanstack/react-table'
-import { Search, RefreshCw, Download, Loader2, Award } from 'lucide-react'
+import { Search, RefreshCw, Download, Loader2, Award, Palette, RotateCcw } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -60,6 +60,16 @@ export function CertificadosTable() {
   const [cursos, setCursos] = useState<Curso[]>([])
   const [gerandoLote, setGerandoLote] = useState(false)
   const [reenviandoId, setReenviandoId] = useState<string | null>(null)
+  const [regenerandoId, setRegenerandoId] = useState<string | null>(null)
+  const [corFonte, setCorFonte] = useState('#FFFFFF')
+
+  const CORES_PRESET = [
+    { label: 'Branco', value: '#FFFFFF' },
+    { label: 'Preto', value: '#000000' },
+    { label: 'Azul Escuro', value: '#1E3A5F' },
+    { label: 'Dourado', value: '#C5A55A' },
+    { label: 'Cinza', value: '#666666' },
+  ]
 
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE)
 
@@ -113,7 +123,7 @@ export function CertificadosTable() {
 
     setGerandoLote(true)
     try {
-      const result = await gerarCertificadoLote(cursoFilter)
+      const result = await gerarCertificadoLote(cursoFilter, corFonte)
       toast.success(
         `Certificados gerados: ${result.gerados}. Erros: ${result.erros}`
       )
@@ -144,9 +154,35 @@ export function CertificadosTable() {
     }
   }
 
+  const handleRegerar = async (participanteId: string) => {
+    setRegenerandoId(participanteId)
+    try {
+      const res = await fetch('/api/pdf/certificado', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ participante_id: participanteId, cor_fonte: corFonte }),
+      })
+      if (res.ok) {
+        toast.success('Certificado regenerado com sucesso!')
+        loadData()
+      } else {
+        const data = await res.json()
+        toast.error(data.error || 'Erro ao regerar certificado')
+      }
+    } catch {
+      toast.error('Erro ao regerar certificado')
+    } finally {
+      setRegenerandoId(null)
+    }
+  }
+
   const handleDownload = (cert: CertificadoWithRelations) => {
     if (cert.pdf_url) {
-      window.open(cert.pdf_url, '_blank')
+      // Adiciona timestamp para evitar cache
+      const url = cert.pdf_url.includes('?')
+        ? `${cert.pdf_url}&t=${Date.now()}`
+        : `${cert.pdf_url}?t=${Date.now()}`
+      window.open(url, '_blank')
     } else {
       toast.error('PDF do certificado nao disponivel')
     }
@@ -209,11 +245,24 @@ export function CertificadosTable() {
             <Button
               variant="ghost"
               size="icon"
+              onClick={() => handleRegerar(row.original.participante_id)}
+              disabled={regenerandoId === row.original.participante_id}
+              title="Regerar Certificado"
+            >
+              {regenerandoId === row.original.participante_id ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <RotateCcw className="h-4 w-4" />
+              )}
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() =>
                 handleReenviar(row.original.participante_id)
               }
               disabled={reenviandoId === row.original.participante_id}
-              title="Reenviar"
+              title="Reenviar por Email"
             >
               {reenviandoId === row.original.participante_id ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -301,6 +350,33 @@ export function CertificadosTable() {
             ))}
           </SelectContent>
         </Select>
+
+        <div className="flex items-center gap-2 ml-auto">
+          <Palette className="h-4 w-4 text-muted-foreground" />
+          <span className="text-sm text-muted-foreground">Cor da fonte:</span>
+          <div className="flex items-center gap-1">
+            {CORES_PRESET.map((cor) => (
+              <button
+                key={cor.value}
+                title={cor.label}
+                onClick={() => setCorFonte(cor.value)}
+                className={`h-7 w-7 rounded-full border-2 transition-all ${
+                  corFonte === cor.value
+                    ? 'border-primary scale-110'
+                    : 'border-gray-300 hover:border-gray-400'
+                }`}
+                style={{ backgroundColor: cor.value }}
+              />
+            ))}
+            <input
+              type="color"
+              value={corFonte}
+              onChange={(e) => setCorFonte(e.target.value)}
+              className="h-7 w-7 cursor-pointer rounded border-0 p-0"
+              title="Cor personalizada"
+            />
+          </div>
+        </div>
       </div>
 
       <div className="rounded-md border bg-white">

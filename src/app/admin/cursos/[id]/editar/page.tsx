@@ -69,7 +69,7 @@ export default function EditarCursoPage() {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">Editar Curso</h1>
-      <CursoForm defaultValues={defaultValues} onSubmit={handleSubmit} />
+      <CursoForm defaultValues={defaultValues} cursoId={id} onSubmit={handleSubmit} />
     </div>
   )
 }

@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Upload, FileCheck, Trash2 } from 'lucide-react'
 
 import { cursoSchema, type CursoFormData } from '@/lib/validators/schemas'
 import { CURSO_STATUS_LABELS } from '@/lib/constants'
@@ -25,12 +25,62 @@ import {
 
 interface CursoFormProps {
   defaultValues?: CursoFormData
+  cursoId?: string // ID do curso quando editando
   onSubmit: (data: CursoFormData) => Promise<void>
 }
 
-export function CursoForm({ defaultValues, onSubmit }: CursoFormProps) {
+export function CursoForm({ defaultValues, cursoId, onSubmit }: CursoFormProps) {
   const router = useRouter()
   const [submitting, setSubmitting] = useState(false)
+  const [templateUrl, setTemplateUrl] = useState<string | null>(null)
+  const [uploadingTemplate, setUploadingTemplate] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Verifica se já existe template para este curso
+  useEffect(() => {
+    if (!cursoId) return
+    fetch(`/api/certificado-template?curso_id=${cursoId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.exists) setTemplateUrl(data.url)
+      })
+      .catch(() => {})
+  }, [cursoId])
+
+  const handleTemplateUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !cursoId) return
+
+    if (file.type !== 'application/pdf') {
+      toast.error('Apenas arquivos PDF são aceitos')
+      return
+    }
+
+    setUploadingTemplate(true)
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('curso_id', cursoId)
+
+      const res = await fetch('/api/certificado-template', {
+        method: 'POST',
+        body: formData,
+      })
+
+      const data = await res.json()
+      if (res.ok) {
+        setTemplateUrl(data.url)
+        toast.success('Template do certificado enviado com sucesso!')
+      } else {
+        toast.error(data.error || 'Erro ao enviar template')
+      }
+    } catch {
+      toast.error('Erro ao enviar template')
+    } finally {
+      setUploadingTemplate(false)
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
+  }
 
   const {
     register,
@@ -209,6 +259,67 @@ export function CursoForm({ defaultValues, onSubmit }: CursoFormProps) {
           )}
         </div>
       </div>
+
+      {/* Template do Certificado */}
+      {cursoId && (
+        <div className="md:col-span-2 rounded-lg border border-dashed border-gray-300 p-6">
+          <h3 className="text-lg font-semibold mb-3">Template do Certificado (PDF)</h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            Envie o PDF da arte do certificado. O sistema irá sobrepor o nome do participante e os dados do evento automaticamente.
+          </p>
+
+          {templateUrl ? (
+            <div className="flex items-center gap-3">
+              <FileCheck className="h-5 w-5 text-green-600" />
+              <span className="text-sm text-green-700 font-medium">Template configurado</span>
+              <a
+                href={templateUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-blue-600 underline"
+              >
+                Visualizar
+              </a>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingTemplate}
+              >
+                {uploadingTemplate ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Upload className="mr-2 h-4 w-4" />
+                )}
+                Substituir
+              </Button>
+            </div>
+          ) : (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploadingTemplate}
+            >
+              {uploadingTemplate ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Upload className="mr-2 h-4 w-4" />
+              )}
+              Enviar Template PDF
+            </Button>
+          )}
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".pdf"
+            className="hidden"
+            onChange={handleTemplateUpload}
+          />
+        </div>
+      )}
 
       {/* Buttons */}
       <div className="flex items-center gap-4">

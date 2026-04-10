@@ -66,7 +66,7 @@ export async function fetchCertificados({
   }
 }
 
-export async function gerarCertificadoLote(curso_id: string): Promise<{
+export async function gerarCertificadoLote(curso_id: string, cor_fonte?: string): Promise<{
   gerados: number
   erros: number
 }> {
@@ -108,7 +108,7 @@ export async function gerarCertificadoLote(curso_id: string): Promise<{
       const response = await fetch('/api/pdf/certificado', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ participante_id: participante.id }),
+        body: JSON.stringify({ participante_id: participante.id, cor_fonte }),
       })
 
       if (response.ok) {

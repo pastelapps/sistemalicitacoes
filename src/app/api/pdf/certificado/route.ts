@@ -6,7 +6,7 @@ import type { Participante, Curso, Certificado } from '@/types/database'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { participante_id } = body as { participante_id: string }
+    const { participante_id, cor_fonte } = body as { participante_id: string; cor_fonte?: string }
 
     if (!participante_id) {
       return NextResponse.json(
@@ -101,6 +101,7 @@ export async function POST(request: NextRequest) {
       curso,
       codigo_verificacao: codigoVerificacao,
       data_emissao: dataEmissao,
+      cor_fonte,
     })
 
     // Atualiza a URL do PDF no certificado

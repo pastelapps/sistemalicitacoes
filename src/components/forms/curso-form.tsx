@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
-import { Loader2, Upload, FileCheck, Trash2 } from 'lucide-react'
+import { Loader2, Upload, FileCheck } from 'lucide-react'
 
 import { cursoSchema, type CursoFormData } from '@/lib/validators/schemas'
 import { CURSO_STATUS_LABELS } from '@/lib/constants'

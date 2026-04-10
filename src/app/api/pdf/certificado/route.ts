@@ -99,8 +99,6 @@ export async function POST(request: NextRequest) {
     const url = await generateCertificado({
       participante,
       curso,
-      codigo_verificacao: codigoVerificacao,
-      data_emissao: dataEmissao,
       cor_fonte,
     })
 

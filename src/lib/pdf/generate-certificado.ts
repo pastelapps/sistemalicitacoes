@@ -8,8 +8,6 @@ import path from 'path'
 interface GenerateCertificadoParams {
   participante: Pick<Participante, 'id' | 'nome' | 'cpf'>
   curso: Pick<Curso, 'id' | 'nome' | 'data_inicio' | 'data_fim' | 'local_nome' | 'local_cidade_uf' | 'carga_horaria'>
-  codigo_verificacao: string
-  data_emissao: string
   cor_fonte?: string // hex color, ex: "#FFFFFF"
 }
 
@@ -17,11 +15,6 @@ const MESES = [
   'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
   'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro',
 ]
-
-function formatDateExtenso(dateStr: string): string {
-  const date = new Date(dateStr + 'T00:00:00')
-  return `${date.getDate()} de ${MESES[date.getMonth()]} de ${date.getFullYear()}`
-}
 
 function getDia(dateStr: string): number {
   return new Date(dateStr + 'T00:00:00').getDate()
@@ -65,8 +58,6 @@ function hexToRgb(hex: string) {
 export async function generateCertificado({
   participante,
   curso,
-  codigo_verificacao,
-  data_emissao,
   cor_fonte = '#FFFFFF',
 }: GenerateCertificadoParams): Promise<string> {
   // Tenta carregar template customizado do Storage, senão usa o padrão local

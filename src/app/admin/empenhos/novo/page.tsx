@@ -21,7 +21,7 @@ export default function NovoEmpenhoPage() {
       participanteIds: participanteIds ?? [],
     })
     toast.success('Nota de empenho criada com sucesso!')
-    router.push('/empenhos')
+    router.push('/admin/empenhos')
   }
 
   return (

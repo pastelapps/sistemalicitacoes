@@ -35,7 +35,7 @@ export default function EditarEmpenhoPage() {
       } catch (error) {
         console.error(error)
         toast.error('Erro ao carregar nota de empenho.')
-        router.push('/empenhos')
+        router.push('/admin/empenhos')
       } finally {
         setLoading(false)
       }
@@ -66,7 +66,7 @@ export default function EditarEmpenhoPage() {
       participanteIds: selectedParticipanteIds,
     })
     toast.success('Nota de empenho atualizada com sucesso!')
-    router.push('/empenhos')
+    router.push('/admin/empenhos')
   }
 
   return (

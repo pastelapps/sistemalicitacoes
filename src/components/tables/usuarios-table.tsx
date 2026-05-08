@@ -213,7 +213,7 @@ export function UsuariosTable() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => router.push(`/usuarios/${user.id}/editar`)}
+                onClick={() => router.push(`/admin/usuarios/${user.id}/editar`)}
               >
                 <Pencil className="h-4 w-4" />
               </Button>
@@ -253,7 +253,7 @@ export function UsuariosTable() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Usuários do Sistema</h1>
-        <Button onClick={() => router.push('/usuarios/novo')}>
+        <Button onClick={() => router.push('/admin/usuarios/novo')}>
           <Plus className="mr-2 h-4 w-4" />
           Novo Usuário
         </Button>

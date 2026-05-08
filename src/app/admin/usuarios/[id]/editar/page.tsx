@@ -35,7 +35,7 @@ export default function EditarUsuarioPage() {
       } catch (error) {
         console.error(error)
         toast.error('Erro ao carregar usuário.')
-        router.push('/usuarios')
+        router.push('/admin/usuarios')
       } finally {
         setLoading(false)
       }
@@ -78,7 +78,7 @@ export default function EditarUsuarioPage() {
     }
 
     toast.success('Usuário atualizado com sucesso!')
-    router.push('/usuarios')
+    router.push('/admin/usuarios')
   }
 
   return (

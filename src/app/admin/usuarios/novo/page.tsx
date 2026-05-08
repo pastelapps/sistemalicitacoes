@@ -27,7 +27,7 @@ export default function NovoUsuarioPage() {
     }
 
     toast.success('Usuário criado com sucesso!')
-    router.push('/usuarios')
+    router.push('/admin/usuarios')
   }
 
   return (

@@ -216,7 +216,7 @@ export function EmpenhosTable() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => router.push(`/empenhos/${empenho.id}/editar`)}
+                onClick={() => router.push(`/admin/empenhos/${empenho.id}/editar`)}
               >
                 <Pencil className="h-4 w-4" />
               </Button>
@@ -269,7 +269,7 @@ export function EmpenhosTable() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Notas de Empenho</h1>
-        <Button onClick={() => router.push('/empenhos/novo')}>
+        <Button onClick={() => router.push('/admin/empenhos/novo')}>
           <Plus className="mr-2 h-4 w-4" />
           Nova Nota
         </Button>

@@ -153,7 +153,7 @@ export function ParticipantesTable() {
         accessorKey: 'nome',
         header: 'Nome',
         cell: ({ row }) => (
-          <div className="max-w-[180px] truncate font-medium" title={row.original.nome}>
+          <div className="max-w-[140px] truncate font-medium" title={row.original.nome}>
             {row.original.nome}
           </div>
         ),
@@ -161,13 +161,13 @@ export function ParticipantesTable() {
       {
         accessorKey: 'cpf',
         header: 'CPF',
-        cell: ({ row }) => <span className="text-xs">{formatCPF(row.original.cpf)}</span>,
+        cell: ({ row }) => <span className="whitespace-nowrap">{formatCPF(row.original.cpf)}</span>,
       },
       {
         id: 'orgao',
         header: 'Órgão',
         cell: ({ row }) => (
-          <div className="max-w-[140px] truncate text-xs" title={row.original.orgao?.nome}>
+          <div className="max-w-[120px] truncate" title={row.original.orgao?.nome}>
             {row.original.orgao?.nome ?? '-'}
           </div>
         ),
@@ -176,15 +176,20 @@ export function ParticipantesTable() {
         id: 'curso',
         header: 'Curso',
         cell: ({ row }) => (
-          <div className="max-w-[160px] truncate text-xs" title={row.original.curso?.nome}>
+          <div className="max-w-[140px] truncate" title={row.original.curso?.nome}>
             {row.original.curso?.nome ?? '-'}
           </div>
         ),
       },
       {
+        accessorKey: 'telefone',
+        header: 'Telefone',
+        cell: ({ row }) => <span className="whitespace-nowrap">{row.original.telefone}</span>,
+      },
+      {
         accessorKey: 'data_compra',
         header: 'Compra',
-        cell: ({ row }) => <span className="text-xs whitespace-nowrap">{formatDate(row.original.data_compra)}</span>,
+        cell: ({ row }) => <span className="whitespace-nowrap">{formatDate(row.original.data_compra)}</span>,
       },
       {
         accessorKey: 'status_pagamento',
@@ -192,7 +197,7 @@ export function ParticipantesTable() {
         cell: ({ row }) => {
           const status = row.original.status_pagamento
           return (
-            <Badge className={`${PAGAMENTO_STATUS_COLORS[status]} text-xs whitespace-nowrap`}>
+            <Badge className={`${PAGAMENTO_STATUS_COLORS[status]} whitespace-nowrap text-[10px] px-2 py-0.5`}>
               {PAGAMENTO_STATUS_LABELS[status]}
             </Badge>
           )
@@ -204,7 +209,7 @@ export function ParticipantesTable() {
         cell: ({ row }) => {
           const status = row.original.status_credenciamento
           return (
-            <Badge className={`${CREDENCIAMENTO_STATUS_COLORS[status]} text-xs whitespace-nowrap`}>
+            <Badge className={`${CREDENCIAMENTO_STATUS_COLORS[status]} whitespace-nowrap text-[10px] px-2 py-0.5`}>
               {CREDENCIAMENTO_STATUS_LABELS[status]}
             </Badge>
           )
@@ -214,40 +219,43 @@ export function ParticipantesTable() {
         id: 'acoes',
         header: () => <div className="text-right">Ações</div>,
         cell: ({ row }) => (
-          <div className="flex items-center justify-end gap-1 whitespace-nowrap">
+          <div className="flex items-center justify-end gap-0.5 whitespace-nowrap">
             <Button
               variant="ghost"
               size="icon"
+              className="h-7 w-7"
               onClick={() => router.push(`/admin/participantes/${row.original.id}`)}
               title="Ver Detalhes"
             >
-              <Eye className="h-4 w-4" />
+              <Eye className="h-3.5 w-3.5" />
             </Button>
             <Button
               variant="ghost"
               size="icon"
+              className="h-7 w-7"
               onClick={() => router.push(`/admin/participantes/${row.original.id}/editar`)}
               title="Editar"
             >
-              <Pencil className="h-4 w-4" />
+              <Pencil className="h-3.5 w-3.5" />
             </Button>
             <Button
               variant="ghost"
               size="icon"
+              className="h-7 w-7"
               onClick={() => router.push(`/admin/participantes/${row.original.id}`)}
               title="Gerar Ingresso / QR Code"
             >
-              <QrCode className="h-4 w-4" />
+              <QrCode className="h-3.5 w-3.5" />
             </Button>
             <Button
               variant="ghost"
               size="icon"
+              className="h-7 w-7 text-red-600 hover:text-red-700 hover:bg-red-50"
               onClick={() => setConfirmDelete({ id: row.original.id, nome: row.original.nome })}
               disabled={deletingId === row.original.id}
               title="Excluir"
-              className="text-red-600 hover:text-red-700 hover:bg-red-50"
             >
-              <Trash2 className="h-4 w-4" />
+              <Trash2 className="h-3.5 w-3.5" />
             </Button>
           </div>
         ),
@@ -346,7 +354,7 @@ export function ParticipantesTable() {
         </Select>
       </div>
 
-      <div className="rounded-md border bg-white [&_td]:py-3 [&_td]:px-3 [&_th]:px-3">
+      <div className="rounded-md border bg-white text-xs [&_td]:py-2 [&_td]:px-2 [&_th]:px-2 [&_th]:h-9">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

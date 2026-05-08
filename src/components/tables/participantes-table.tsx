@@ -29,6 +29,14 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 
 import { fetchParticipantes } from '@/hooks/use-participantes'
 import { createClient } from '@/lib/supabase/client'
@@ -64,6 +72,7 @@ export function ParticipantesTable() {
   const [cursos, setCursos] = useState<Curso[]>([])
   const [orgaos, setOrgaos] = useState<Orgao[]>([])
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [confirmDelete, setConfirmDelete] = useState<{ id: string; nome: string } | null>(null)
 
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE)
 
@@ -103,10 +112,9 @@ export function ParticipantesTable() {
     }
   }, [page, search, cursoFilter, orgaoFilter, pagamentoFilter, credenciamentoFilter])
 
-  const handleDelete = useCallback(async (id: string, nome: string) => {
-    if (!confirm(`Tem certeza que deseja excluir o participante "${nome}"? Esta ação não pode ser desfeita.`)) {
-      return
-    }
+  const handleDelete = useCallback(async () => {
+    if (!confirmDelete) return
+    const { id } = confirmDelete
 
     setDeletingId(id)
     try {
@@ -121,6 +129,7 @@ export function ParticipantesTable() {
       if (error) throw error
 
       toast.success('Participante excluído com sucesso!')
+      setConfirmDelete(null)
       loadData()
     } catch (error) {
       console.error('Erro ao excluir participante:', error)
@@ -128,7 +137,7 @@ export function ParticipantesTable() {
     } finally {
       setDeletingId(null)
     }
-  }, [loadData])
+  }, [confirmDelete, loadData])
 
   useEffect(() => {
     loadData()
@@ -224,7 +233,7 @@ export function ParticipantesTable() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => handleDelete(row.original.id, row.original.nome)}
+              onClick={() => setConfirmDelete({ id: row.original.id, nome: row.original.nome })}
               disabled={deletingId === row.original.id}
               title="Excluir"
               className="text-red-500 hover:text-red-700 hover:bg-red-50"
@@ -235,7 +244,7 @@ export function ParticipantesTable() {
         ),
       },
     ],
-    [router, handleDelete, deletingId]
+    [router, deletingId]
   )
 
   const table = useReactTable({
@@ -404,6 +413,35 @@ export function ParticipantesTable() {
           </div>
         </div>
       )}
+
+      <Dialog open={!!confirmDelete} onOpenChange={(open) => !open && setConfirmDelete(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Excluir participante</DialogTitle>
+            <DialogDescription>
+              Você tem certeza que deseja excluir o participante{' '}
+              <strong>{confirmDelete?.nome}</strong>? Esta ação não pode ser desfeita.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setConfirmDelete(null)}
+              disabled={!!deletingId}
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={!!deletingId}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {deletingId ? 'Excluindo...' : 'Excluir'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

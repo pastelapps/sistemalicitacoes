@@ -67,33 +67,6 @@ export function ParticipantesTable() {
 
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE)
 
-  const handleDelete = useCallback(async (id: string, nome: string) => {
-    if (!confirm(`Tem certeza que deseja excluir o participante "${nome}"? Esta ação não pode ser desfeita.`)) {
-      return
-    }
-
-    setDeletingId(id)
-    try {
-      const supabase = createClient()
-
-      // Remove certificados vinculados primeiro
-      await supabase.from('certificados').delete().eq('participante_id', id)
-
-      // Remove o participante
-      const { error } = await supabase.from('participantes').delete().eq('id', id)
-
-      if (error) throw error
-
-      toast.success('Participante excluído com sucesso!')
-      loadData()
-    } catch (error) {
-      console.error('Erro ao excluir participante:', error)
-      toast.error('Erro ao excluir participante')
-    } finally {
-      setDeletingId(null)
-    }
-  }, [loadData])
-
   useEffect(() => {
     async function loadDropdowns() {
       const supabase = createClient()
@@ -129,6 +102,33 @@ export function ParticipantesTable() {
       setLoading(false)
     }
   }, [page, search, cursoFilter, orgaoFilter, pagamentoFilter, credenciamentoFilter])
+
+  const handleDelete = useCallback(async (id: string, nome: string) => {
+    if (!confirm(`Tem certeza que deseja excluir o participante "${nome}"? Esta ação não pode ser desfeita.`)) {
+      return
+    }
+
+    setDeletingId(id)
+    try {
+      const supabase = createClient()
+
+      // Remove certificados vinculados primeiro
+      await supabase.from('certificados').delete().eq('participante_id', id)
+
+      // Remove o participante
+      const { error } = await supabase.from('participantes').delete().eq('id', id)
+
+      if (error) throw error
+
+      toast.success('Participante excluído com sucesso!')
+      loadData()
+    } catch (error) {
+      console.error('Erro ao excluir participante:', error)
+      toast.error('Erro ao excluir participante')
+    } finally {
+      setDeletingId(null)
+    }
+  }, [loadData])
 
   useEffect(() => {
     loadData()

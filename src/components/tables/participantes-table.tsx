@@ -166,7 +166,11 @@ export function ParticipantesTable() {
       {
         id: 'curso',
         header: 'Curso',
-        cell: ({ row }) => row.original.curso?.nome ?? '-',
+        cell: ({ row }) => (
+          <div className="max-w-[200px] truncate" title={row.original.curso?.nome}>
+            {row.original.curso?.nome ?? '-'}
+          </div>
+        ),
       },
       {
         accessorKey: 'telefone',
@@ -203,9 +207,9 @@ export function ParticipantesTable() {
       },
       {
         id: 'acoes',
-        header: 'Acoes',
+        header: () => <div className="text-right">Ações</div>,
         cell: ({ row }) => (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-end gap-1 whitespace-nowrap">
             <Button
               variant="ghost"
               size="icon"
@@ -236,7 +240,7 @@ export function ParticipantesTable() {
               onClick={() => setConfirmDelete({ id: row.original.id, nome: row.original.nome })}
               disabled={deletingId === row.original.id}
               title="Excluir"
-              className="text-red-500 hover:text-red-700 hover:bg-red-50"
+              className="text-red-600 hover:text-red-700 hover:bg-red-50"
             >
               <Trash2 className="h-4 w-4" />
             </Button>

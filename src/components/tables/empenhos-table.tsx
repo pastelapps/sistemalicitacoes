@@ -14,7 +14,7 @@ import { toast } from 'sonner'
 import type { NotaEmpenhoWithRelations, EmpenhoStatus, Curso } from '@/types/database'
 import { fetchEmpenhos, aprovarEmpenho, rejeitarEmpenho } from '@/hooks/use-empenhos'
 import { fetchCursos } from '@/hooks/use-cursos'
-import { formatCurrency, formatDate } from '@/lib/utils'
+import { formatDate } from '@/lib/utils'
 import {
   EMPENHO_STATUS_LABELS,
   EMPENHO_STATUS_COLORS,
@@ -159,11 +159,6 @@ export function EmpenhosTable() {
         id: 'curso',
         header: 'Curso',
         cell: ({ row }) => row.original.curso?.nome ?? '-',
-      },
-      {
-        accessorKey: 'valor',
-        header: 'Valor',
-        cell: ({ row }) => formatCurrency(row.original.valor),
       },
       {
         accessorKey: 'qtd_participantes',

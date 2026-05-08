@@ -128,6 +128,7 @@ export async function createEmpenho({
     .insert({
       ...formData,
       arquivo_url,
+      valor: 0,
       observacoes: formData.observacoes || null,
     } as never)
     .select('*')

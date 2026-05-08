@@ -96,7 +96,6 @@ export const notaEmpenhoSchema = z.object({
   curso_id: z.string().uuid('Selecione um curso'),
   orgao_id: z.string().uuid('Selecione um órgão'),
   numero_nota: z.string().min(1, 'Número da nota é obrigatório'),
-  valor: z.string().min(1, 'Valor é obrigatório'),
   qtd_participantes: z.string().min(1, 'Quantidade é obrigatória'),
   status: z.enum(['pendente', 'recebida', 'aprovada', 'rejeitada']),
   observacoes: z.string().optional(),

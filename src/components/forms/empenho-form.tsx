@@ -54,7 +54,6 @@ export function EmpenhoForm({
       curso_id: '',
       orgao_id: '',
       numero_nota: '',
-      valor: '',
       qtd_participantes: '1',
       status: 'pendente',
       observacoes: '',
@@ -211,15 +210,6 @@ export function EmpenhoForm({
         <Input id="numero_nota" {...register('numero_nota')} />
         {errors.numero_nota && (
           <p className="text-sm text-red-500">{errors.numero_nota.message}</p>
-        )}
-      </div>
-
-      {/* Valor */}
-      <div className="space-y-2">
-        <Label htmlFor="valor">Valor (R$)</Label>
-        <Input id="valor" type="number" step="0.01" {...register('valor')} />
-        {errors.valor && (
-          <p className="text-sm text-red-500">{errors.valor.message}</p>
         )}
       </div>
 

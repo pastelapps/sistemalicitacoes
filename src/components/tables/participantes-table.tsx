@@ -8,7 +8,7 @@ import {
   flexRender,
   type ColumnDef,
 } from '@tanstack/react-table'
-import { Search, Plus, Eye, Pencil, QrCode } from 'lucide-react'
+import { Search, Plus, Eye, Pencil, QrCode, Trash2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -32,6 +32,7 @@ import {
 
 import { fetchParticipantes } from '@/hooks/use-participantes'
 import { createClient } from '@/lib/supabase/client'
+import { toast } from 'sonner'
 import { formatCPF, formatDate } from '@/lib/utils'
 import { ITEMS_PER_PAGE } from '@/lib/constants'
 import {
@@ -62,8 +63,36 @@ export function ParticipantesTable() {
   const [loading, setLoading] = useState(true)
   const [cursos, setCursos] = useState<Curso[]>([])
   const [orgaos, setOrgaos] = useState<Orgao[]>([])
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE)
+
+  const handleDelete = useCallback(async (id: string, nome: string) => {
+    if (!confirm(`Tem certeza que deseja excluir o participante "${nome}"? Esta ação não pode ser desfeita.`)) {
+      return
+    }
+
+    setDeletingId(id)
+    try {
+      const supabase = createClient()
+
+      // Remove certificados vinculados primeiro
+      await supabase.from('certificados').delete().eq('participante_id', id)
+
+      // Remove o participante
+      const { error } = await supabase.from('participantes').delete().eq('id', id)
+
+      if (error) throw error
+
+      toast.success('Participante excluído com sucesso!')
+      loadData()
+    } catch (error) {
+      console.error('Erro ao excluir participante:', error)
+      toast.error('Erro ao excluir participante')
+    } finally {
+      setDeletingId(null)
+    }
+  }, [loadData])
 
   useEffect(() => {
     async function loadDropdowns() {
@@ -192,11 +221,21 @@ export function ParticipantesTable() {
             >
               <QrCode className="h-4 w-4" />
             </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleDelete(row.original.id, row.original.nome)}
+              disabled={deletingId === row.original.id}
+              title="Excluir"
+              className="text-red-500 hover:text-red-700 hover:bg-red-50"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
           </div>
         ),
       },
     ],
-    [router]
+    [router, handleDelete, deletingId]
   )
 
   const table = useReactTable({

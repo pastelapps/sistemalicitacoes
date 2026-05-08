@@ -152,42 +152,47 @@ export function ParticipantesTable() {
       {
         accessorKey: 'nome',
         header: 'Nome',
+        cell: ({ row }) => (
+          <div className="max-w-[180px] truncate font-medium" title={row.original.nome}>
+            {row.original.nome}
+          </div>
+        ),
       },
       {
         accessorKey: 'cpf',
         header: 'CPF',
-        cell: ({ row }) => formatCPF(row.original.cpf),
+        cell: ({ row }) => <span className="text-xs">{formatCPF(row.original.cpf)}</span>,
       },
       {
         id: 'orgao',
-        header: 'Orgao',
-        cell: ({ row }) => row.original.orgao?.nome ?? '-',
+        header: 'Órgão',
+        cell: ({ row }) => (
+          <div className="max-w-[140px] truncate text-xs" title={row.original.orgao?.nome}>
+            {row.original.orgao?.nome ?? '-'}
+          </div>
+        ),
       },
       {
         id: 'curso',
         header: 'Curso',
         cell: ({ row }) => (
-          <div className="max-w-[200px] truncate" title={row.original.curso?.nome}>
+          <div className="max-w-[160px] truncate text-xs" title={row.original.curso?.nome}>
             {row.original.curso?.nome ?? '-'}
           </div>
         ),
       },
       {
-        accessorKey: 'telefone',
-        header: 'Telefone',
-      },
-      {
         accessorKey: 'data_compra',
-        header: 'Data Compra',
-        cell: ({ row }) => formatDate(row.original.data_compra),
+        header: 'Compra',
+        cell: ({ row }) => <span className="text-xs whitespace-nowrap">{formatDate(row.original.data_compra)}</span>,
       },
       {
         accessorKey: 'status_pagamento',
-        header: 'Status Pagamento',
+        header: 'Pagto',
         cell: ({ row }) => {
           const status = row.original.status_pagamento
           return (
-            <Badge className={PAGAMENTO_STATUS_COLORS[status]}>
+            <Badge className={`${PAGAMENTO_STATUS_COLORS[status]} text-xs whitespace-nowrap`}>
               {PAGAMENTO_STATUS_LABELS[status]}
             </Badge>
           )
@@ -195,11 +200,11 @@ export function ParticipantesTable() {
       },
       {
         accessorKey: 'status_credenciamento',
-        header: 'Status Credenciamento',
+        header: 'Credenc.',
         cell: ({ row }) => {
           const status = row.original.status_credenciamento
           return (
-            <Badge className={CREDENCIAMENTO_STATUS_COLORS[status]}>
+            <Badge className={`${CREDENCIAMENTO_STATUS_COLORS[status]} text-xs whitespace-nowrap`}>
               {CREDENCIAMENTO_STATUS_LABELS[status]}
             </Badge>
           )
@@ -341,7 +346,7 @@ export function ParticipantesTable() {
         </Select>
       </div>
 
-      <div className="rounded-md border bg-white">
+      <div className="rounded-md border bg-white [&_td]:py-3 [&_td]:px-3 [&_th]:px-3">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

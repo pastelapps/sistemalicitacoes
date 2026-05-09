@@ -77,7 +77,6 @@ export default function EditarEmpenhoPage() {
           curso_id: empenho.curso_id,
           orgao_id: empenho.orgao_id,
           numero_nota: empenho.numero_nota,
-          valor: String(empenho.valor),
           qtd_participantes: String(empenho.qtd_participantes),
           status: empenho.status,
           observacoes: empenho.observacoes ?? '',

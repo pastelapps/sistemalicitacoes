@@ -42,7 +42,7 @@ export default function EditarOrgaoPage() {
   const handleSubmit = async (data: OrgaoFormData) => {
     await updateOrgao(id, {
       ...data,
-      cnpj: cleanCNPJ(data.cnpj),
+      cnpj: data.cnpj ? cleanCNPJ(data.cnpj) : '',
       responsavel_nome: data.responsavel_nome || null,
       responsavel_email: data.responsavel_email || null,
       responsavel_telefone: data.responsavel_telefone || null,

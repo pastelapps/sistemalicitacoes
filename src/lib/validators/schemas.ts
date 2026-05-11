@@ -1,13 +1,9 @@
 import { z } from 'zod'
-import { cpf as cpfValidator, cnpj as cnpjValidator } from 'cpf-cnpj-validator'
+import { cpf as cpfValidator } from 'cpf-cnpj-validator'
 
 // Custom validators
 const cpfSchema = z.string().refine((val) => cpfValidator.isValid(val.replace(/\D/g, '')), {
   message: 'CPF inválido',
-})
-
-const cnpjSchema = z.string().refine((val) => cnpjValidator.isValid(val.replace(/\D/g, '')), {
-  message: 'CNPJ inválido',
 })
 
 // Login

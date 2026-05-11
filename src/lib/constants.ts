@@ -87,13 +87,18 @@ export const UF_OPTIONS = [
 export const ORGAO_TIPO_OPTIONS = [
   'Polícia Militar',
   'Polícia Civil',
+  'Polícia Penal',
   'Corpo de Bombeiros',
   'Guarda Municipal',
   'Polícia Federal',
   'Polícia Rodoviária Federal',
   'Secretaria de Segurança',
+  'Secretaria de Administração',
   'Prefeitura',
   'Governo Estadual',
+  'Convidado Congressista',
+  'Indicado Congressista',
+  'Empresa Privada',
   'Outro',
 ] as const
 

@@ -41,17 +41,17 @@ export const cursoSchema = z.object({
   path: ['data_fim'],
 })
 
-// Órgão
+// Órgão (todos os campos são opcionais, exceto nome)
 export const orgaoSchema = z.object({
   nome: z.string().min(1, 'Nome é obrigatório'),
-  cnpj: cnpjSchema,
-  tipo: z.string().min(1, 'Tipo é obrigatório'),
-  uf: z.string().min(2, 'UF é obrigatório'),
-  cidade: z.string().min(1, 'Cidade é obrigatória'),
-  responsavel_nome: z.string().optional(),
+  cnpj: z.string().optional().or(z.literal('')),
+  tipo: z.string().optional().or(z.literal('')),
+  uf: z.string().optional().or(z.literal('')),
+  cidade: z.string().optional().or(z.literal('')),
+  responsavel_nome: z.string().optional().or(z.literal('')),
   responsavel_email: z.string().email('Email inválido').optional().or(z.literal('')),
-  responsavel_telefone: z.string().optional(),
-  observacoes: z.string().optional(),
+  responsavel_telefone: z.string().optional().or(z.literal('')),
+  observacoes: z.string().optional().or(z.literal('')),
 })
 
 // Participante

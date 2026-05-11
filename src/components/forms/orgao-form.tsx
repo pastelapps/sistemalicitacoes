@@ -81,7 +81,7 @@ export function OrgaoForm({ defaultValues, onSubmit }: OrgaoFormProps) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="cnpj">CNPJ *</Label>
+        <Label htmlFor="cnpj">CNPJ</Label>
         <Input
           id="cnpj"
           value={watch('cnpj')}
@@ -95,7 +95,7 @@ export function OrgaoForm({ defaultValues, onSubmit }: OrgaoFormProps) {
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label>Tipo *</Label>
+          <Label>Tipo</Label>
           <Select
             value={tipoValue}
             onValueChange={(value) => setValue('tipo', value, { shouldValidate: true })}
@@ -117,7 +117,7 @@ export function OrgaoForm({ defaultValues, onSubmit }: OrgaoFormProps) {
         </div>
 
         <div className="space-y-2">
-          <Label>UF *</Label>
+          <Label>UF</Label>
           <Select
             value={ufValue}
             onValueChange={(value) => setValue('uf', value, { shouldValidate: true })}
@@ -140,7 +140,7 @@ export function OrgaoForm({ defaultValues, onSubmit }: OrgaoFormProps) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="cidade">Cidade *</Label>
+        <Label htmlFor="cidade">Cidade</Label>
         <Input id="cidade" {...register('cidade')} />
         {errors.cidade && (
           <p className="text-sm text-destructive">{errors.cidade.message}</p>

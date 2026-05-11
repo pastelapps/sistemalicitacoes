@@ -8,7 +8,9 @@ import {
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { Pencil, Plus, Users } from 'lucide-react'
+import { Pencil, Plus, Users, Trash2 } from 'lucide-react'
+import { toast } from 'sonner'
+import { createClient } from '@/lib/supabase/client'
 
 import type { Orgao } from '@/types/database'
 import { formatCNPJ } from '@/lib/utils'
@@ -34,6 +36,14 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 
 const columnHelper = createColumnHelper<Orgao>()
 
@@ -46,6 +56,8 @@ export function OrgaosTable() {
   const [tipo, setTipo] = useState('')
   const [uf, setUf] = useState('')
   const [loading, setLoading] = useState(true)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [confirmDelete, setConfirmDelete] = useState<{ id: string; nome: string } | null>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const loadData = useCallback(async (params: {
@@ -75,6 +87,43 @@ export function OrgaosTable() {
   useEffect(() => {
     loadData({ page, search, tipo, uf })
   }, [page, tipo, uf, loadData]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleDelete = useCallback(async () => {
+    if (!confirmDelete) return
+    const { id } = confirmDelete
+
+    setDeletingId(id)
+    try {
+      const supabase = createClient()
+
+      // Verifica se há participantes vinculados
+      const { count: pCount } = await supabase
+        .from('participantes')
+        .select('id', { count: 'exact', head: true })
+        .eq('orgao_id', id)
+
+      if ((pCount ?? 0) > 0) {
+        toast.error(`Existem ${pCount} participantes vinculados a este órgão. Remova-os antes de excluir.`)
+        setConfirmDelete(null)
+        return
+      }
+
+      // Remove notas de empenho vinculadas
+      await supabase.from('notas_empenho').delete().eq('orgao_id', id)
+
+      const { error } = await supabase.from('orgaos').delete().eq('id', id)
+      if (error) throw error
+
+      toast.success('Órgão excluído com sucesso!')
+      setConfirmDelete(null)
+      loadData({ page, search, tipo, uf })
+    } catch (error) {
+      console.error('Erro ao excluir órgão:', error)
+      toast.error('Erro ao excluir órgão')
+    } finally {
+      setDeletingId(null)
+    }
+  }, [confirmDelete, loadData, page, search, tipo, uf])
 
   const handleSearchChange = (value: string) => {
     setSearch(value)
@@ -117,13 +166,14 @@ export function OrgaosTable() {
       }),
       columnHelper.display({
         id: 'actions',
-        header: 'Ações',
+        header: () => <div className="text-right">Ações</div>,
         cell: (info) => (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-end gap-1">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => router.push(`/admin/orgaos/${info.row.original.id}/editar`)}
+              title="Editar"
             >
               <Pencil className="h-4 w-4" />
             </Button>
@@ -131,14 +181,25 @@ export function OrgaosTable() {
               variant="ghost"
               size="sm"
               onClick={() => router.push(`/admin/participantes?orgao=${info.row.original.id}`)}
+              title="Ver participantes"
             >
               <Users className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setConfirmDelete({ id: info.row.original.id, nome: info.row.original.nome })}
+              disabled={deletingId === info.row.original.id}
+              title="Excluir"
+              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+            >
+              <Trash2 className="h-4 w-4" />
             </Button>
           </div>
         ),
       }),
     ],
-    [router]
+    [router, deletingId]
   )
 
   const table = useReactTable({
@@ -271,6 +332,35 @@ export function OrgaosTable() {
           </div>
         </div>
       )}
+
+      <Dialog open={!!confirmDelete} onOpenChange={(open) => !open && setConfirmDelete(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Excluir órgão</DialogTitle>
+            <DialogDescription>
+              Você tem certeza que deseja excluir o órgão{' '}
+              <strong>{confirmDelete?.nome}</strong>? Esta ação não pode ser desfeita.
+              Se houver participantes vinculados, eles precisam ser removidos antes.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setConfirmDelete(null)}
+              disabled={!!deletingId}
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleDelete}
+              disabled={!!deletingId}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {deletingId ? 'Excluindo...' : 'Excluir'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

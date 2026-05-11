@@ -8,7 +8,7 @@ import {
   flexRender,
   type ColumnDef,
 } from '@tanstack/react-table'
-import { Search, Plus, Eye, Pencil, QrCode, Trash2 } from 'lucide-react'
+import { Search, Plus, Eye, Pencil, QrCode, Trash2, FileText, Send, Loader2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -73,6 +73,8 @@ export function ParticipantesTable() {
   const [orgaos, setOrgaos] = useState<Orgao[]>([])
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [confirmDelete, setConfirmDelete] = useState<{ id: string; nome: string } | null>(null)
+  const [batchAction, setBatchAction] = useState<'generate' | 'send' | null>(null)
+  const [confirmBatch, setConfirmBatch] = useState<'generate' | 'send' | null>(null)
 
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE)
 
@@ -111,6 +113,63 @@ export function ParticipantesTable() {
       setLoading(false)
     }
   }, [page, search, cursoFilter, orgaoFilter, pagamentoFilter, credenciamentoFilter])
+
+  const handleBatchGenerate = useCallback(async () => {
+    setBatchAction('generate')
+    setConfirmBatch(null)
+    const t = toast.loading('Gerando ingressos... isso pode levar alguns minutos')
+    try {
+      const res = await fetch('/api/pdf/ingresso/batch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      })
+      const data = await res.json()
+      toast.dismiss(t)
+      if (!res.ok) {
+        toast.error(data.error || 'Erro ao gerar ingressos')
+      } else {
+        toast.success(
+          `${data.success} ingressos gerados${data.errors > 0 ? `, ${data.errors} erros` : ''}.`
+        )
+        loadData()
+      }
+    } catch (e) {
+      toast.dismiss(t)
+      toast.error(e instanceof Error ? e.message : 'Erro inesperado')
+    } finally {
+      setBatchAction(null)
+    }
+  }, [loadData])
+
+  const handleBatchSend = useCallback(async () => {
+    setBatchAction('send')
+    setConfirmBatch(null)
+    const t = toast.loading('Enviando emails... isso pode levar alguns minutos')
+    try {
+      const res = await fetch('/api/email/ingresso-batch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      })
+      const data = await res.json()
+      toast.dismiss(t)
+      if (!res.ok) {
+        toast.error(data.error || 'Erro ao enviar emails')
+      } else {
+        const parts: string[] = []
+        if (data.success) parts.push(`${data.success} enviados`)
+        if (data.errors) parts.push(`${data.errors} erros`)
+        if (data.skipped) parts.push(`${data.skipped} pulados`)
+        toast.success(parts.join(', ') || 'Concluído')
+      }
+    } catch (e) {
+      toast.dismiss(t)
+      toast.error(e instanceof Error ? e.message : 'Erro inesperado')
+    } finally {
+      setBatchAction(null)
+    }
+  }, [])
 
   const handleDelete = useCallback(async () => {
     if (!confirmDelete) return
@@ -274,12 +333,40 @@ export function ParticipantesTable() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
         <h1 className="text-2xl font-bold">Participantes</h1>
-        <Button onClick={() => router.push('/admin/participantes/novo')}>
-          <Plus className="mr-2 h-4 w-4" />
-          Novo Participante
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setConfirmBatch('generate')}
+            disabled={!!batchAction}
+            title="Gera o PDF do ingresso para todos os participantes"
+          >
+            {batchAction === 'generate' ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <FileText className="mr-2 h-4 w-4" />
+            )}
+            Gerar todos ingressos
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => setConfirmBatch('send')}
+            disabled={!!batchAction}
+            title="Envia o ingresso por email para todos os participantes"
+          >
+            {batchAction === 'send' ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Send className="mr-2 h-4 w-4" />
+            )}
+            Enviar todos por email
+          </Button>
+          <Button onClick={() => router.push('/admin/participantes/novo')}>
+            <Plus className="mr-2 h-4 w-4" />
+            Novo Participante
+          </Button>
+        </div>
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
@@ -430,6 +517,35 @@ export function ParticipantesTable() {
           </div>
         </div>
       )}
+
+      <Dialog open={!!confirmBatch} onOpenChange={(open) => !open && setConfirmBatch(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {confirmBatch === 'generate'
+                ? 'Gerar todos os ingressos?'
+                : 'Enviar todos os ingressos por email?'}
+            </DialogTitle>
+            <DialogDescription>
+              {confirmBatch === 'generate'
+                ? 'Esta operação irá gerar o PDF do ingresso para TODOS os participantes do banco. Pode levar alguns minutos. Os ingressos já gerados serão sobrescritos.'
+                : 'Esta operação irá enviar o ingresso por email para TODOS os participantes que tenham PDF gerado e email válido. Pode levar alguns minutos.'}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfirmBatch(null)} disabled={!!batchAction}>
+              Cancelar
+            </Button>
+            <Button
+              onClick={confirmBatch === 'generate' ? handleBatchGenerate : handleBatchSend}
+              disabled={!!batchAction}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              {batchAction ? 'Processando...' : 'Confirmar'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={!!confirmDelete} onOpenChange={(open) => !open && setConfirmDelete(null)}>
         <DialogContent>

@@ -182,6 +182,7 @@ export async function generateCertificado({
     .upload(fileName, Buffer.from(pdfBytes), {
       contentType: 'application/pdf',
       upsert: true,
+      cacheControl: '0', // evita cache do CDN
     })
 
   if (uploadError) {

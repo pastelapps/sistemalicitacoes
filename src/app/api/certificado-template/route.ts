@@ -31,6 +31,7 @@ export async function POST(request: NextRequest) {
       .upload(fileName, buffer, {
         contentType: 'application/pdf',
         upsert: true,
+        cacheControl: '0', // evita cache do CDN para que próximas gerações peguem o novo template
       })
 
     if (uploadError) {

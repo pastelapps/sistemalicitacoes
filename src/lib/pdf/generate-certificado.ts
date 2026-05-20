@@ -105,44 +105,43 @@ export async function generateCertificado({
   const diaFim = getDia(curso.data_fim)
   const mes = getMes(curso.data_fim)
   const ano = getAno(curso.data_fim)
-  const cidade = curso.local_cidade_uf || ''
+  // Cidade: normaliza "Florianópolis - SC" → "Florianópolis/SC"
+  const cidade = (curso.local_cidade_uf || '').replace(/\s*-\s*/g, '/')
   const cargaH = curso.carga_horaria
-  // Limpa o nome do curso: remove sigla " - " no final se houver, e " - Congresso..." prefixo
-  // Mantém só "Congresso Nacional de Compras da Segurança Pública (COMPRASEG)"
-  let cursoTitulo = curso.nome
-  // Se vier "COMPRASEG 2026 - Congresso Nacional ..." mantém só o nome longo + sigla
+  // Nome do curso: separa nome longo da sigla
+  // "COMPRASEG 2026 - Congresso Nacional ..." → nomeLongo="Congresso Nacional...", sigla="COMPRASEG"
+  let nomeLongo = curso.nome
+  let sigla = ''
   const partes = curso.nome.split(' - ')
   if (partes.length > 1) {
-    const sigla = partes[0].replace(/\s+\d+$/, '').trim() // "COMPRASEG 2026" → "COMPRASEG"
-    cursoTitulo = `${partes.slice(1).join(' - ')} (${sigla})`
+    sigla = partes[0].replace(/\s+\d+$/, '').trim() // "COMPRASEG 2026" → "COMPRASEG"
+    nomeLongo = partes.slice(1).join(' - ')
   }
 
   const textoSize = 14
   const lineHeight = 20
-  // Linha 1: "Pela participação no <CURSO>,"
-  // Linha 2: "nos dias X a Y de MÊS de ANO, na cidade de CIDADE,"
-  // Linha 3: "com carga horária de N horas."
+  // Linha 1: "Pela participação no Congresso Nacional... (COMPRASEG),"
+  // Linha 2: "nos dias X a Y de MÊS de ANO, na cidade de CIDADE, com carga horária de N horas."
   type Seg = { text: string; bold: boolean }
   const linhas: Seg[][] = [
     [
       { text: 'Pela participação no ', bold: false },
-      { text: cursoTitulo + ',', bold: true },
+      { text: nomeLongo, bold: true },
+      ...(sigla ? [{ text: ` (${sigla})`, bold: false }] : []),
+      { text: ',', bold: false },
     ],
     [
       { text: 'nos dias ', bold: false },
       { text: `${diaInicio} a ${diaFim} de ${mes} de ${ano}`, bold: true },
       { text: ', na cidade de ', bold: false },
       { text: cidade, bold: true },
-      { text: ',', bold: false },
-    ],
-    [
-      { text: 'com carga horária de ', bold: false },
+      { text: ', com carga horária de ', bold: false },
       { text: `${cargaH} horas`, bold: true },
       { text: '.', bold: false },
     ],
   ]
 
-  const textoStartY = height * 0.36 // logo abaixo da linha azul (50%) com algum espaço
+  const textoStartY = height * 0.38 // logo abaixo da linha azul
 
   linhas.forEach((segs, idx) => {
     let totalWidth = 0

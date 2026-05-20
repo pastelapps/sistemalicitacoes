@@ -72,38 +72,23 @@ export async function gerarCertificadoLote(curso_id: string, cor_fonte?: string)
 }> {
   const supabase = createClient()
 
-  // Busca todos os participantes credenciados deste curso que nao tem certificado
+  // Busca TODOS os participantes do curso (não filtra por credenciamento — gera pra todos)
   const { data: participantes, error: partError } = await supabase
     .from('participantes')
     .select('id')
-    .eq('curso_id', curso_id)
-    .eq('status_credenciamento', 'credenciado') as { data: Array<{ id: string }> | null; error: Error | null }
+    .eq('curso_id', curso_id) as { data: Array<{ id: string }> | null; error: Error | null }
 
   if (partError) throw partError
   if (!participantes || participantes.length === 0) {
     return { gerados: 0, erros: 0 }
   }
 
-  // Busca certificados ja existentes para este curso
-  const { data: certExistentes } = await supabase
-    .from('certificados')
-    .select('participante_id')
-    .eq('curso_id', curso_id) as { data: Array<{ participante_id: string }> | null; error: Error | null }
-
-  const idsComCertificado = new Set(
-    (certExistentes ?? []).map((c) => c.participante_id)
-  )
-
-  // Filtra participantes sem certificado
-  const semCertificado = participantes.filter(
-    (p) => !idsComCertificado.has(p.id)
-  )
-
   let gerados = 0
   let erros = 0
 
-  // Gera certificados em sequencia para evitar sobrecarregar a API
-  for (const participante of semCertificado) {
+  // Gera certificados em sequência. A rota /api/pdf/certificado já trata
+  // tanto criação quanto atualização (regeneração com o template atual).
+  for (const participante of participantes) {
     try {
       const response = await fetch('/api/pdf/certificado', {
         method: 'POST',

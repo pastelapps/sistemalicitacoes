@@ -75,10 +75,21 @@ export async function generateCertificado({
 
   // Mantém frente e verso do template
 
-  // Fontes — desativa ligatures da Great Vibes (alguns pares como "ba" renderizam errado)
+  // Fontes — desativa TODAS as features OpenType da Great Vibes
+  // A fonte tem glyphs contextuais bugados (pares "ba","ne","nt","rr") que
+  // o pdf-lib renderiza com espaço extra entre as letras.
   const fontGreatVibes = await pdfDoc.embedFont(
     fs.readFileSync(path.join(templatesDir, 'GreatVibes-Regular.ttf')),
-    { features: { liga: false, dlig: false, clig: false, rlig: false, calt: false } }
+    {
+      features: {
+        liga: false, dlig: false, clig: false, rlig: false, calt: false,
+        kern: false, swsh: false, salt: false, hist: false, ccmp: false,
+        init: false, medi: false, fina: false, isol: false,
+        mark: false, mkmk: false, locl: false, frac: false, ordn: false,
+        ss01: false, ss02: false, ss03: false, ss04: false, ss05: false,
+        ss06: false, ss07: false, ss08: false, ss09: false, ss10: false,
+      },
+    }
   )
   const fontPoppins = await pdfDoc.embedFont(fs.readFileSync(path.join(templatesDir, 'Poppins-Regular.ttf')))
   const fontPoppinsBold = await pdfDoc.embedFont(fs.readFileSync(path.join(templatesDir, 'Poppins-Bold.ttf')))

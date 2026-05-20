@@ -21,8 +21,8 @@ const supabase = createClient(
 
   const participante = {
     id: 'test-' + Date.now(),
-    nome: 'Anna Elayse Monteiro Lobato',
-    cpf: '432.233.892-53',
+    nome: 'Oliene Isabel Sarmento Corrêa',
+    cpf: '693.099.652-15',
   }
 
   console.log('Gerando certificado de teste...')

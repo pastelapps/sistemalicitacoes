@@ -7,7 +7,7 @@ import {
   flexRender,
   type ColumnDef,
 } from '@tanstack/react-table'
-import { Search, RefreshCw, Download, Loader2, Award, Palette, RotateCcw } from 'lucide-react'
+import { Search, RefreshCw, Download, Loader2, Award, Palette, RotateCcw, Send } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -59,6 +59,7 @@ export function CertificadosTable() {
   const [loading, setLoading] = useState(true)
   const [cursos, setCursos] = useState<Curso[]>([])
   const [gerandoLote, setGerandoLote] = useState(false)
+  const [enviandoLote, setEnviandoLote] = useState(false)
   const [reenviandoId, setReenviandoId] = useState<string | null>(null)
   const [regenerandoId, setRegenerandoId] = useState<string | null>(null)
   const [corFonte, setCorFonte] = useState('#FFFFFF')
@@ -114,6 +115,39 @@ export function CertificadosTable() {
   useEffect(() => {
     setPage(1)
   }, [search, cursoFilter, statusFilter])
+
+  const handleEnviarLote = async () => {
+    if (!confirm('Enviar certificado por email para TODOS os participantes? Esta operação pode levar alguns minutos.')) {
+      return
+    }
+    setEnviandoLote(true)
+    const t = toast.loading('Enviando emails... isso pode levar alguns minutos')
+    try {
+      const cursoIdParam = cursoFilter && cursoFilter !== 'all' ? cursoFilter : undefined
+      const res = await fetch('/api/email/certificado-batch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ curso_id: cursoIdParam }),
+      })
+      const data = await res.json()
+      toast.dismiss(t)
+      if (!res.ok) {
+        toast.error(data.error || 'Erro ao enviar emails')
+      } else {
+        const parts: string[] = []
+        if (data.success) parts.push(`${data.success} enviados`)
+        if (data.errors) parts.push(`${data.errors} erros`)
+        if (data.skipped) parts.push(`${data.skipped} pulados`)
+        toast.success(parts.join(', ') || 'Concluído')
+        loadData()
+      }
+    } catch (e) {
+      toast.dismiss(t)
+      toast.error(e instanceof Error ? e.message : 'Erro inesperado')
+    } finally {
+      setEnviandoLote(false)
+    }
+  }
 
   const handleGerarLote = async () => {
     if (!cursoFilter || cursoFilter === 'all') {
@@ -295,16 +329,31 @@ export function CertificadosTable() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
         <h1 className="text-2xl font-bold">Certificados</h1>
-        <Button onClick={handleGerarLote} disabled={gerandoLote}>
-          {gerandoLote ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <Award className="mr-2 h-4 w-4" />
-          )}
-          Gerar em Lote
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={handleEnviarLote}
+            disabled={enviandoLote || gerandoLote}
+            title="Envia o certificado por email para todos os participantes"
+          >
+            {enviandoLote ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Send className="mr-2 h-4 w-4" />
+            )}
+            Enviar em Lote por Email
+          </Button>
+          <Button onClick={handleGerarLote} disabled={gerandoLote || enviandoLote}>
+            {gerandoLote ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Award className="mr-2 h-4 w-4" />
+            )}
+            Gerar em Lote
+          </Button>
+        </div>
       </div>
 
       <div className="flex flex-wrap items-center gap-3">

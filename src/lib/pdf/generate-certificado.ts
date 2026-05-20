@@ -97,31 +97,25 @@ export async function generateCertificado({
     color: corTexto,
   })
 
-  // TEXTO DO EVENTO (Poppins) — abaixo da linha azul, antes da assinatura
-  // Exemplo: "Pela participação no Congresso Nacional de Compras da Segurança Pública (COMPRASEG),
-  //          nos dias 12 a 14 de maio de 2026, na cidade de Florianópolis/SC,
-  //          com carga horária de 24 horas."
+  // TEXTO DO EVENTO (Poppins) — abaixo da linha azul
   const diaInicio = getDia(curso.data_inicio)
   const diaFim = getDia(curso.data_fim)
   const mes = getMes(curso.data_fim)
   const ano = getAno(curso.data_fim)
-  // Cidade: normaliza "Florianópolis - SC" → "Florianópolis/SC"
   const cidade = (curso.local_cidade_uf || '').replace(/\s*-\s*/g, '/')
   const cargaH = curso.carga_horaria
-  // Nome do curso: separa nome longo da sigla
-  // "COMPRASEG 2026 - Congresso Nacional ..." → nomeLongo="Congresso Nacional...", sigla="COMPRASEG"
+
+  // Separa nome longo da sigla: "COMPRASEG 2026 - Congresso ..." → nomeLongo + sigla
   let nomeLongo = curso.nome
   let sigla = ''
   const partes = curso.nome.split(' - ')
   if (partes.length > 1) {
-    sigla = partes[0].replace(/\s+\d+$/, '').trim() // "COMPRASEG 2026" → "COMPRASEG"
+    sigla = partes[0].replace(/\s+\d+$/, '').trim()
     nomeLongo = partes.slice(1).join(' - ')
   }
 
   const textoSize = 14
   const lineHeight = 20
-  // Linha 1: "Pela participação no Congresso Nacional... (COMPRASEG),"
-  // Linha 2: "nos dias X a Y de MÊS de ANO, na cidade de CIDADE, com carga horária de N horas."
   type Seg = { text: string; bold: boolean }
   const linhas: Seg[][] = [
     [
@@ -131,7 +125,7 @@ export async function generateCertificado({
       { text: ',', bold: false },
     ],
     [
-      { text: 'nos dias ', bold: false },
+      { text: 'realizado de ', bold: false },
       { text: `${diaInicio} a ${diaFim} de ${mes} de ${ano}`, bold: true },
       { text: ', na cidade de ', bold: false },
       { text: cidade, bold: true },
@@ -141,7 +135,7 @@ export async function generateCertificado({
     ],
   ]
 
-  const textoStartY = height * 0.38 // logo abaixo da linha azul
+  const textoStartY = height * 0.38
 
   linhas.forEach((segs, idx) => {
     let totalWidth = 0

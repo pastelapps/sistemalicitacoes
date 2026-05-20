@@ -31,13 +31,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Verifica se o participante foi credenciado
-    if (participante.status_credenciamento !== 'credenciado') {
-      return NextResponse.json(
-        { error: 'Participante nao foi credenciado. Apenas participantes credenciados podem receber certificado.' },
-        { status: 400 }
-      )
-    }
+    // Nota: a checagem de status_credenciamento === 'credenciado' foi removida
+    // pra suportar emissão antecipada em lote (envio por email antes do evento).
+    // Se quiser restringir a emissão individual pós-evento, valide no chamador.
 
     // Busca curso
     const { data: curso, error: cursoError } = await supabase

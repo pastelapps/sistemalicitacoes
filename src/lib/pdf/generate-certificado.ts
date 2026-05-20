@@ -75,8 +75,11 @@ export async function generateCertificado({
 
   // Mantém frente e verso do template
 
-  // Fontes
-  const fontGreatVibes = await pdfDoc.embedFont(fs.readFileSync(path.join(templatesDir, 'GreatVibes-Regular.ttf')))
+  // Fontes — desativa ligatures da Great Vibes (alguns pares como "ba" renderizam errado)
+  const fontGreatVibes = await pdfDoc.embedFont(
+    fs.readFileSync(path.join(templatesDir, 'GreatVibes-Regular.ttf')),
+    { features: { liga: false, dlig: false, clig: false, rlig: false, calt: false } }
+  )
   const fontPoppins = await pdfDoc.embedFont(fs.readFileSync(path.join(templatesDir, 'Poppins-Regular.ttf')))
   const fontPoppinsBold = await pdfDoc.embedFont(fs.readFileSync(path.join(templatesDir, 'Poppins-Bold.ttf')))
 
@@ -85,10 +88,16 @@ export async function generateCertificado({
 
   const centerX = width / 2
 
-  // NOME DO PARTICIPANTE (Great Vibes) — entre "ESTE CERTIFICADO É CONFERIDO A" e a linha azul
-  const nomeSize = 60
+  // NOME DO PARTICIPANTE (Great Vibes) — auto-ajusta tamanho pra nomes longos
   const nomeText = participante.nome
-  const nomeWidth = fontGreatVibes.widthOfTextAtSize(nomeText, nomeSize)
+  const maxNomeWidth = width * 0.80
+  let nomeSize = 60
+  let nomeWidth = fontGreatVibes.widthOfTextAtSize(nomeText, nomeSize)
+  if (nomeWidth > maxNomeWidth) {
+    nomeSize = Math.max(28, Math.floor(nomeSize * (maxNomeWidth / nomeWidth)))
+    nomeWidth = fontGreatVibes.widthOfTextAtSize(nomeText, nomeSize)
+  }
+
   page.drawText(nomeText, {
     x: centerX - nomeWidth / 2,
     y: height * 0.56,

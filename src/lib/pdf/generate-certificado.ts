@@ -135,7 +135,7 @@ export async function generateCertificado({
     ],
   ]
 
-  const textoStartY = height * 0.38
+  const textoStartY = height * 0.45 // bem próximo da linha azul
 
   linhas.forEach((segs, idx) => {
     let totalWidth = 0
